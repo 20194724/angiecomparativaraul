@@ -1,716 +1,126 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard de Ventas</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Raúl vs Angie — Comparativa semanal</title>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --bg: #FAFAF9;
-  --white: #ffffff;
-  --border: #E8E8E5;
-  --text: #1A1A18;
-  --text2: #5C5C58;
-  --text3: #A0A09A;
-  --blue: #2563EB;
-  --blue-l: #EFF6FF;
-  --orange: #EA580C;
-  --orange-l: #FFF7ED;
-  --green: #16A34A;
-  --green-l: #F0FDF4;
-  --red: #DC2626;
-  --red-l: #FEF2F2;
-  --yellow: #D97706;
-  --yellow-l: #FFFBEB;
-  --proj: #8B5CF6;
-  --proj-l: #F5F3FF;
-  --pink: #DB2777;
-  --pink-l: #FDF2F8;
-  --teal: #0D9488;
-  --teal-l: #F0FDFA;
-  --radius: 10px;
-  --sh: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
-}
-
-body { font-family: 'DM Sans', -apple-system, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
-
-.page { max-width: 980px; margin: 0 auto; padding: 52px 36px 100px; }
-@media (max-width: 700px) { .page { padding: 28px 16px 80px; } }
-
-/* Header */
-.page-icon { font-size: 2.2rem; margin-bottom: 8px; }
-.header-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 38px; }
-.page-title { font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 600; letter-spacing: -0.03em; line-height: 1.15; }
-.page-sub { color: var(--text3); font-size: 13px; margin-top: 5px; font-weight: 300; }
-.date-chip { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 5px 11px; font-size: 12px; color: var(--text2); white-space: nowrap; align-self: flex-start; }
-
-/* KPI grid */
-.kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 38px; }
-@media (max-width: 750px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
-.kpi { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 15px 17px; box-shadow: var(--sh); }
-.kpi-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text3); margin-bottom: 5px; }
-.kpi-value { font-size: 1.25rem; font-weight: 600; letter-spacing: -0.025em; line-height: 1.1; }
-.kpi-sub { font-size: 11px; color: var(--text3); margin-top: 4px; font-weight: 300; }
-.badge { display: inline-block; font-size: 10px; font-weight: 500; padding: 1px 6px; border-radius: 4px; margin-top: 5px; }
-.b-green { background: var(--green-l); color: var(--green); }
-.b-blue  { background: var(--blue-l);  color: var(--blue); }
-.b-red   { background: var(--red-l);   color: var(--red); }
-.b-yellow{ background: var(--yellow-l);color: var(--yellow); }
-.b-proj  { background: var(--proj-l);  color: var(--proj); }
-
-hr.div { border: none; border-top: 1px solid var(--border); margin: 34px 0; }
-
-.sec { margin-bottom: 38px; }
-.sec-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text3); margin-bottom: 4px; }
-.sec-title { font-size: 1rem; font-weight: 500; margin-bottom: 16px; }
-
-/* Card */
-.card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 22px 18px; box-shadow: var(--sh); position: relative; }
-.card-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; gap: 12px; flex-wrap: wrap; }
-.card-title { font-size: 13px; font-weight: 500; }
-.card-sub   { font-size: 11px; color: var(--text3); margin-top: 2px; font-weight: 300; }
-.legend { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-.leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
-.leg-line { width: 14px; height: 2px; border-radius: 1px; }
-.leg-dash { width: 14px; height: 0; border-top: 2px dashed; }
-.leg-sq   { width: 9px; height: 9px; border-radius: 2px; }
-
-svg { display: block; width: 100%; overflow: visible; }
-
-.tt { position: absolute; background: var(--text); color: #fff; border-radius: 8px; padding: 8px 12px; font-size: 12px; pointer-events: none; opacity: 0; transition: opacity 0.1s; z-index: 30; white-space: nowrap; transform: translateX(-50%); box-shadow: 0 8px 20px rgba(0,0,0,0.18); }
-.tt.show { opacity: 1; }
-.tt-lbl { opacity: 0.5; font-size: 10px; margin-bottom: 2px; font-weight: 300; }
-.tt-val { font-weight: 600; font-size: 13px; }
-.tt-sub { opacity: 0.5; font-size: 10px; margin-top: 1px; }
-
-.two-col   { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-@media (max-width: 680px) { .two-col, .three-col { grid-template-columns: 1fr; } }
-
-.note { background: var(--proj-l); border: 1px solid rgba(139,92,246,0.2); border-radius: 8px; padding: 10px 14px; font-size: 11.5px; color: #5B21B6; margin-top: 14px; display: flex; gap: 8px; font-weight: 300; }
-.note strong { font-weight: 500; }
-
-.warn-note { background: var(--red-l); border: 1px solid rgba(220,38,38,0.18); border-radius: 8px; padding: 10px 14px; font-size: 11.5px; color: #991B1B; margin-top: 14px; display: flex; gap: 8px; font-weight: 300; }
-.warn-note strong { font-weight: 500; }
-
-/* Bar rows */
-.bar-row { display: flex; flex-direction: column; gap: 9px; }
-.bar-item { display: flex; align-items: center; gap: 10px; }
-.bi-label { font-size: 11px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 400; }
-.bi-track { flex: 1; background: #F1F1EE; border-radius: 4px; height: 8px; overflow: hidden; }
-.bi-fill  { height: 100%; border-radius: 4px; }
-.bi-val   { font-size: 11px; font-weight: 500; color: var(--text); min-width: 36px; text-align: right; }
-.bi-sub   { font-size: 10px; color: var(--text3); min-width: 32px; text-align: right; }
-
-/* Donut */
-.donut-wrap { display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap; }
-.donut-legend { display: flex; flex-direction: column; gap: 7px; }
-.donut-leg-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text2); }
-.donut-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-.donut-leg-val { font-weight: 500; color: var(--text); }
-
-/* Vendor cards */
-.vendor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-@media (max-width: 600px) { .vendor-grid { grid-template-columns: 1fr; } }
-.vendor-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--sh); }
-.vendor-name { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 12px; }
-.vendor-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.vs-item-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); font-weight: 500; margin-bottom: 2px; }
-.vs-item-val   { font-size: 1rem; font-weight: 600; letter-spacing: -0.02em; }
-
-/* Insights */
-.insight-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-@media (max-width: 720px) { .insight-grid { grid-template-columns: 1fr; } }
-.insight { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--sh); }
-.insight.warn { border-left: 3px solid #F59E0B; }
-.insight.good { border-left: 3px solid #22C55E; }
-.insight.info { border-left: 3px solid var(--blue); }
-.insight.danger { border-left: 3px solid var(--red); }
-.insight-icon  { font-size: 1.1rem; margin-bottom: 8px; }
-.insight-title { font-size: 12px; font-weight: 600; margin-bottom: 5px; }
-.insight-body  { font-size: 12px; color: var(--text2); line-height: 1.6; font-weight: 300; }
-.insight-body strong { color: var(--text); font-weight: 500; }
-
-/* Problem tag */
-.prob-tag { display: inline-block; font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 4px; background: var(--red-l); color: var(--red); }
-
-/* Margin indicator */
-.margin-bar-wrap { margin-top: 6px; }
-.margin-track { height: 6px; background: #F1F1EE; border-radius: 3px; overflow: hidden; }
-.margin-fill  { height: 100%; border-radius: 3px; background: var(--green); }
+:root{--bg:#f4f2ee;--paper:#fff;--ink:#171717;--muted:#706d68;--line:#e8e3dc;--raul:#263d65;--angie:#8a3d56;--good:#255d49;--bad:#9c3d3d;--soft:#f8f6f2}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial}
+.wrap{max-width:1380px;margin:auto;padding:28px 18px 70px}
+header{display:flex;justify-content:space-between;gap:20px;align-items:flex-end;margin-bottom:20px}
+h1{font-size:clamp(34px,6vw,72px);line-height:.95;letter-spacing:-.055em;margin:0} .sub{color:var(--muted);margin-top:12px;max-width:780px;line-height:1.5}
+.tag{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:10px 14px;font-weight:750;white-space:nowrap}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:22px;box-shadow:0 12px 35px rgba(30,25,20,.035)}
+.hero{display:grid;grid-template-columns:1fr 1fr;overflow:hidden} .side{padding:24px} .side:first-child{border-right:1px solid var(--line)}
+.person{display:flex;align-items:center;gap:11px;font-size:20px;font-weight:850} .dot{width:12px;height:12px;border-radius:50%} .raul{background:var(--raul)} .angie{background:var(--angie)}
+.big{font-size:clamp(38px,6vw,70px);font-weight:900;letter-spacing:-.055em;margin:12px 0 2px} .muted{color:var(--muted)}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:17px} .metric{background:var(--soft);padding:12px;border-radius:14px} .metric b{font-size:20px;display:block} .metric span{font-size:11px;color:var(--muted)}
+.section{margin-top:22px} .section-head{display:flex;align-items:end;justify-content:space-between;gap:15px;margin:0 4px 11px} h2{font-size:24px;letter-spacing:-.025em;margin:0} .explain{font-size:12px;color:var(--muted);max-width:650px}
+.scoreboard{display:grid;grid-template-columns:repeat(3,1fr);gap:12px} .scorecard{padding:19px} .scorecard .winner{font-size:28px;font-weight:900;margin-top:8px} .scorecard p{color:var(--muted);font-size:13px;line-height:1.5;margin-bottom:0}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:20px;background:#fff} table{border-collapse:collapse;width:100%;min-width:1320px} th{background:#242321;color:#fff;padding:13px 11px;text-align:left;font-size:11px;position:sticky;top:0;z-index:1} td{padding:12px 11px;border-bottom:1px solid var(--line);font-size:12px;vertical-align:top} tr:hover td{background:#fcfbf9} .winner-pill{display:inline-flex;padding:5px 9px;border-radius:999px;font-weight:800;background:#eeeae4} .rtext{color:var(--raul);font-weight:800} .atext{color:var(--angie);font-weight:800}
+.weeks{display:grid;grid-template-columns:repeat(2,1fr);gap:14px} .week{padding:20px} .weektop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start} .week h3{font-size:22px;margin:0} .range{font-size:12px;color:var(--muted);margin-top:3px} .headline{font-weight:800;line-height:1.35;margin:16px 0 5px} .reading{font-size:13px;color:var(--muted);line-height:1.5}
+.duel{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px} .duelbox{border:1px solid var(--line);border-radius:15px;padding:13px} .duelbox h4{margin:0 0 9px;font-size:14px} .row{display:flex;justify-content:space-between;gap:9px;border-top:1px dashed var(--line);padding:7px 0;font-size:12px} .row:first-of-type{border-top:0} .bar{height:7px;background:#ece8e2;border-radius:99px;overflow:hidden;margin:5px 0 10px} .bar>i{display:block;height:100%;border-radius:99px}
+.flags{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px} .flagbox{padding:11px;border-radius:13px;font-size:12px;line-height:1.45} .green{background:#edf5f1} .red{background:#faeeee} .none{color:var(--muted);font-style:italic}
+.note{font-size:12px;color:var(--muted);line-height:1.6;margin-top:20px;padding:16px 18px}
+@media(max-width:900px){header{align-items:flex-start;flex-direction:column}.hero,.weeks{grid-template-columns:1fr}.side:first-child{border-right:0;border-bottom:1px solid var(--line)}.scoreboard{grid-template-columns:1fr}}
+@media(max-width:600px){.wrap{padding:18px 12px 45px}.metrics{grid-template-columns:1fr 1fr}.duel,.flags{grid-template-columns:1fr}.card{border-radius:17px}}
 </style>
 </head>
-<body>
-<div class="page">
+<body><main class="wrap">
+<header><div><h1>Raúl <span style="color:#aaa">vs</span> Angie</h1><div class="sub">Comparativa semanal del comportamiento dentro del chat. No repite la evaluación anterior: aquí el foco está en quién participa, quién inicia, quién pregunta, quién propone, quién responde más rápido y quién refleja más “ganas” en cada semana.</div></div><div class="tag">16 mayo–15 julio 2026</div></header>
 
-  <!-- HEADER -->
-  <div class="page-icon">📊</div>
-  <div class="header-row">
-    <div>
-      <h1 class="page-title">Análisis de Ventas</h1>
-      <p class="page-sub">Noviembre 2025 — Febrero 2026 · 51 pedidos</p>
-    </div>
-    <div class="date-chip">Feb 22, 2026</div>
-  </div>
+<section class="card hero" id="hero"></section>
 
-  <!-- KPIs -->
-  <div class="kpi-grid">
-    <div class="kpi">
-      <div class="kpi-label">Venta neta total</div>
-      <div class="kpi-value">S/. 4,958</div>
-      <div class="kpi-sub">51 pedidos</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Utilidad total</div>
-      <div class="kpi-value">S/. 2,680</div>
-      <div class="kpi-sub">margen promedio 53%</div>
-      <div class="badge b-green">↑ sólido</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Mejor semana</div>
-      <div class="kpi-value">S/. 593</div>
-      <div class="kpi-sub">S10 · util. 63.4% margen</div>
-      <div class="badge b-green">pico histórico</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Pedidos c/ problema</div>
-      <div class="kpi-value">2 / 51</div>
-      <div class="kpi-sub">S/. 24.00 afectados</div>
-      <div class="badge b-yellow">3.9% tasa</div>
-    </div>
-    <div class="kpi">
-      <div class="kpi-label">Ticket promedio</div>
-      <div class="kpi-value">S/. 97.2</div>
-      <div class="kpi-sub">utilidad prom. S/. 52.5</div>
-      <div class="badge b-blue">estable</div>
-    </div>
-  </div>
+<section class="section">
+<div class="section-head"><div><h2>Resultado comparativo general</h2></div><div class="explain">Los ganadores se calculan únicamente con señales visibles en WhatsApp. “Quiere más” e “índice de ganas” son indicadores recreativos, no una medición real de sentimientos.</div></div>
+<div class="scoreboard" id="scoreboard"></div>
+</section>
 
-  <hr class="div">
+<section class="section">
+<div class="section-head"><h2>Resumen completo por semana</h2><div class="explain">“Inicio” = primer mensaje después de al menos 6 horas de silencio. Respuesta = mediana del tiempo para contestar, excluyendo pausas superiores a 12 horas.</div></div>
+<div class="table-wrap"><table>
+<thead><tr><th>Semana</th><th>Mensajes R / A</th><th>Quién inicia</th><th>Respuesta mediana R / A</th><th>Preguntas R / A</th><th>Planes R / A</th><th>Afecto R / A</th><th>Cuidado R / A</th><th>Más ganas</th><th>Quién “quiere más”</th><th>Lectura</th></tr></thead>
+<tbody id="summaryBody"></tbody></table></div>
+</section>
 
-  <!-- WEEKLY: VENTA + UTILIDAD -->
-  <div class="sec">
-    <div class="sec-label">Ventas semanales</div>
-    <div class="sec-title">Venta neta + Utilidad + Proyección</div>
-    <div class="card">
-      <div class="card-head">
-        <div>
-          <div class="card-title">Venta neta vs. Utilidad por semana (S/.)</div>
-          <div class="card-sub">S1–S12 histórico · S13–S16 proyección · áreas sombreadas = utilidad</div>
-        </div>
-        <div class="legend">
-          <div class="leg"><div class="leg-line" style="background:var(--blue)"></div>Venta neta</div>
-          <div class="leg"><div class="leg-line" style="background:var(--green)"></div>Utilidad</div>
-          <div class="leg"><div class="leg-dash" style="border-color:var(--proj)"></div>Proyección</div>
-        </div>
-      </div>
-      <svg id="wsvg" viewBox="0 0 880 250" preserveAspectRatio="xMidYMid meet"></svg>
-      <div class="tt" id="wtt"></div>
-      <div class="note">
-        <span>🔮</span>
-        <span>Proyección lineal sobre S7–S12. <strong>S13 ≈ S/. 748 · S14 ≈ S/. 819 · S15 ≈ S/. 890 · S16 ≈ S/. 961.</strong> Utilidad proyectada para marzo: <strong>~S/. 1,750</strong> si el margen se mantiene en ~53%.</span>
-      </div>
-    </div>
-  </div>
+<section class="section">
+<div class="section-head"><h2>Análisis extenso semana por semana</h2><div class="explain">Cada tarjeta presenta una comparación directa y flags separados. Cuando no aparece una señal clara, se indica expresamente que no hay green o red flag detectable en el chat.</div></div>
+<div class="weeks" id="weeks"></div>
+</section>
 
-  <!-- MONTHLY -->
-  <div class="sec">
-    <div class="sec-label">Ventas mensuales</div>
-    <div class="sec-title">Venta neta · Costo · Utilidad por mes</div>
-    <div class="card">
-      <div class="card-head">
-        <div>
-          <div class="card-title">Desglose mensual (S/.)</div>
-          <div class="card-sub">Barras apiladas: costo (rojo suave) + utilidad (verde)</div>
-        </div>
-        <div class="legend">
-          <div class="leg"><div class="leg-sq" style="background:rgba(22,163,74,0.75)"></div>Utilidad</div>
-          <div class="leg"><div class="leg-sq" style="background:rgba(220,38,38,0.25)"></div>Costo</div>
-        </div>
-      </div>
-      <svg id="msvg" viewBox="0 0 880 220" preserveAspectRatio="xMidYMid meet"></svg>
-      <div class="tt" id="mtt"></div>
-    </div>
-  </div>
-
-  <hr class="div">
-
-  <!-- PRODUCTOS -->
-  <div class="sec">
-    <div class="sec-label">Productos</div>
-    <div class="sec-title">Frecuencia, utilidad y margen por modelo</div>
-    <div class="two-col">
-
-      <div class="card">
-        <div class="card-head"><div>
-          <div class="card-title">Modelos más vendidos</div>
-          <div class="card-sub">Unidades · Utilidad total</div>
-        </div></div>
-        <div class="bar-row" id="prod-freq"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-head"><div>
-          <div class="card-title">Margen % por producto</div>
-          <div class="card-sub">Utilidad ÷ Venta neta promedio</div>
-        </div></div>
-        <div class="bar-row" id="prod-margin"></div>
-      </div>
-
-    </div>
-
-    <div class="note" style="margin-top:14px;">
-      <span>💡</span>
-      <span><strong>PERSONALIZADO</strong> tiene el margen más alto (74%) y la mayor utilidad por pedido (S/. 102). <strong>CSM-B 1200</strong> es el peor (32% margen, S/. 9 de utilidad promedio en casos normales). Si puedes hacer más pedidos personalizados, hazlos.</span>
-    </div>
-  </div>
-
-  <hr class="div">
-
-  <!-- VENDEDORES -->
-  <div class="sec">
-    <div class="sec-label">Vendedores</div>
-    <div class="sec-title">Comparativa Alberto vs. Gonzalo</div>
-    <div class="vendor-grid">
-      <div class="vendor-card">
-        <div class="vendor-name">🧑 Alberto</div>
-        <div class="vendor-stats">
-          <div><div class="vs-item-label">Pedidos</div><div class="vs-item-val">8</div></div>
-          <div><div class="vs-item-label">Venta neta</div><div class="vs-item-val">S/. 644</div></div>
-          <div><div class="vs-item-label">Utilidad</div><div class="vs-item-val">S/. 350</div></div>
-          <div><div class="vs-item-label">Margen</div><div class="vs-item-val">54.3%</div></div>
-          <div><div class="vs-item-label">Ticket prom.</div><div class="vs-item-val">S/. 80.5</div></div>
-          <div><div class="vs-item-label">Util. por ped.</div><div class="vs-item-val">S/. 43.7</div></div>
-        </div>
-        <div class="margin-bar-wrap">
-          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:4px;margin-top:12px;"><span>Participación en ventas</span><span>13%</span></div>
-          <div class="margin-track"><div class="margin-fill" style="width:13%;background:var(--blue)"></div></div>
-        </div>
-      </div>
-      <div class="vendor-card">
-        <div class="vendor-name">🧑 Gonzalo</div>
-        <div class="vendor-stats">
-          <div><div class="vs-item-label">Pedidos</div><div class="vs-item-val">43</div></div>
-          <div><div class="vs-item-label">Venta neta</div><div class="vs-item-val">S/. 4,315</div></div>
-          <div><div class="vs-item-label">Utilidad</div><div class="vs-item-val">S/. 2,330</div></div>
-          <div><div class="vs-item-label">Margen</div><div class="vs-item-val">54.0%</div></div>
-          <div><div class="vs-item-label">Ticket prom.</div><div class="vs-item-val">S/. 100.3</div></div>
-          <div><div class="vs-item-label">Util. por ped.</div><div class="vs-item-val">S/. 54.2</div></div>
-        </div>
-        <div class="margin-bar-wrap">
-          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:4px;margin-top:12px;"><span>Participación en ventas</span><span>87%</span></div>
-          <div class="margin-track"><div class="margin-fill" style="width:87%;"></div></div>
-        </div>
-      </div>
-    </div>
-    <div class="warn-note">
-      <span>⚠️</span>
-      <span>Alberto tiene prácticamente <strong>0 ventas desde diciembre</strong>. Su ticket promedio (S/. 80.5) es S/. 20 menor que Gonzalo. Sin embargo, su <strong>margen es casi idéntico (54.3%)</strong> — el problema no es eficiencia, es volumen. Necesita más pedidos asignados.</span>
-    </div>
-  </div>
-
-  <hr class="div">
-
-  <!-- PROBLEMAS -->
-  <div class="sec">
-    <div class="sec-label">Incidencias</div>
-    <div class="sec-title">Pedidos con problemas registrados</div>
-    <div class="two-col">
-      <div class="card">
-        <div class="card-head"><div>
-          <div class="card-title">Historial de problemas</div>
-          <div class="card-sub">2 incidencias · S/. 24.00 en costos adicionales</div>
-        </div></div>
-        <div style="display:flex;flex-direction:column;gap:12px;">
-          <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--red-l);border-radius:8px;border:1px solid rgba(220,38,38,0.12);">
-            <div style="font-size:1.2rem;flex-shrink:0;">📦</div>
-            <div>
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <span style="font-size:12px;font-weight:500;">#33 · Anthony Flores</span>
-                <span class="prob-tag">CAMBIO</span>
-              </div>
-              <div style="font-size:11.5px;color:var(--text2);font-weight:300;">N-N 1200 · Feb 5, 2026 · Costo adicional: <strong style="color:var(--red)">S/. 12.00</strong></div>
-            </div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--yellow-l);border-radius:8px;border:1px solid rgba(217,119,6,0.15);">
-            <div style="font-size:1.2rem;flex-shrink:0;">🔀</div>
-            <div>
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                <span style="font-size:12px;font-weight:500;">#44 · Mery Pamela Santos</span>
-                <span style="display:inline-block;font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px;background:var(--yellow-l);color:var(--yellow);border:1px solid rgba(217,119,6,0.2);">REDIRECCIONAMIENTO</span>
-              </div>
-              <div style="font-size:11.5px;color:var(--text2);font-weight:300;">OP-L-B 890 · Feb 16, 2026 · Costo adicional: <strong style="color:var(--yellow)">S/. 12.00</strong></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-head"><div>
-          <div class="card-title">Tasa de problemas</div>
-          <div class="card-sub">Por courier · pedidos afectados</div>
-        </div></div>
-        <div style="display:flex;flex-direction:column;gap:14px;">
-          <div>
-            <div style="font-size:11px;color:var(--text2);margin-bottom:6px;">Tasa global de incidencias</div>
-            <div style="display:flex;align-items:center;gap:10px;">
-              <div style="flex:1;height:10px;background:#F1F1EE;border-radius:5px;overflow:hidden;">
-                <div style="width:3.9%;height:100%;background:var(--red);border-radius:5px;"></div>
-              </div>
-              <span style="font-size:12px;font-weight:500;color:var(--text);">3.9%</span>
-            </div>
-            <div style="font-size:11px;color:var(--text3);margin-top:4px;font-weight:300;">2 de 51 pedidos</div>
-          </div>
-          <div style="background:var(--bg);border-radius:8px;padding:12px;font-size:12px;color:var(--text2);line-height:1.7;">
-            <div style="font-weight:500;color:var(--text);margin-bottom:6px;">Ambos problemas ocurrieron en:</div>
-            <div>· <strong>DINSIDES</strong> (cambio) — 1 de 14 pedidos = 7.1%</div>
-            <div>· <strong>SHALOM</strong> (redireccionamiento) — 1 de 11 pedidos = 9.1%</div>
-            <div style="margin-top:8px;color:var(--text3);font-size:11px;">NOSOTROS, IN DRVER y OLVA: 0 incidencias.</div>
-          </div>
-          <div style="font-size:11.5px;color:var(--text2);background:var(--green-l);border-radius:8px;padding:10px 12px;border:1px solid rgba(22,163,74,0.15);font-weight:300;">
-            ✅ La tasa de 3.9% es baja. Si crece por encima del 8–10%, sería señal de alerta operativa.
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <hr class="div">
-
-  <!-- PÚBLICO -->
-  <div class="sec">
-    <div class="sec-label">Público</div>
-    <div class="sec-title">¿Quién te compra?</div>
-    <div class="three-col">
-
-      <div class="card">
-        <div class="card-title" style="margin-bottom:16px;">Género</div>
-        <div class="donut-wrap">
-          <svg viewBox="0 0 120 120" width="100" height="100" style="flex-shrink:0">
-            <circle cx="60" cy="60" r="44" fill="none" stroke="#F5F5F3" stroke-width="16"/>
-            <circle cx="60" cy="60" r="44" fill="none" stroke="var(--pink)" stroke-width="16"
-              stroke-dasharray="140.2 136.7" stroke-dashoffset="34.9"/>
-            <circle cx="60" cy="60" r="44" fill="none" stroke="var(--blue)" stroke-width="16"
-              stroke-dasharray="129.4 147.5" stroke-dashoffset="-105.3"/>
-            <circle cx="60" cy="60" r="44" fill="none" stroke="#E8E8E5" stroke-width="16"
-              stroke-dasharray="8.6 268.1" stroke-dashoffset="-234.7"/>
-            <text x="60" y="55" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="13" font-weight="600" fill="#1A1A18">51</text>
-            <text x="60" y="68" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" fill="#A0A09A">pedidos</text>
-          </svg>
-          <div class="donut-legend">
-            <div class="donut-leg-item"><div class="donut-dot" style="background:var(--pink)"></div><div><div class="donut-leg-val">Mujeres</div><div>26 · 51%</div></div></div>
-            <div class="donut-leg-item"><div class="donut-dot" style="background:var(--blue)"></div><div><div class="donut-leg-val">Hombres</div><div>24 · 47%</div></div></div>
-            <div class="donut-leg-item"><div class="donut-dot" style="background:#E8E8E5"></div><div><div class="donut-leg-val">N/D</div><div>1 · 2%</div></div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title" style="margin-bottom:16px;">Ubicación</div>
-        <div class="donut-wrap">
-          <svg viewBox="0 0 120 120" width="100" height="100" style="flex-shrink:0">
-            <circle cx="60" cy="60" r="44" fill="none" stroke="#F5F5F3" stroke-width="16"/>
-            <circle cx="60" cy="60" r="44" fill="none" stroke="var(--teal)" stroke-width="16"
-              stroke-dasharray="184.3 92.6" stroke-dashoffset="34.9"/>
-            <circle cx="60" cy="60" r="44" fill="none" stroke="var(--orange)" stroke-width="16"
-              stroke-dasharray="92.6 184.3" stroke-dashoffset="-149.4"/>
-            <text x="60" y="55" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="13" font-weight="600" fill="#1A1A18">67%</text>
-            <text x="60" y="68" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" fill="#A0A09A">provincia</text>
-          </svg>
-          <div class="donut-legend">
-            <div class="donut-leg-item"><div class="donut-dot" style="background:var(--teal)"></div><div><div class="donut-leg-val">Provincia</div><div>34 · 67%</div></div></div>
-            <div class="donut-leg-item"><div class="donut-dot" style="background:var(--orange)"></div><div><div class="donut-leg-val">Lima</div><div>17 · 33%</div></div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title" style="margin-bottom:16px;">Género × Ubicación</div>
-        <div style="display:flex;flex-direction:column;gap:14px;">
-          <div>
-            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;">
-              <span style="color:var(--pink);font-weight:500;">♀ Mujeres (26)</span>
-            </div>
-            <div style="display:flex;height:9px;border-radius:5px;overflow:hidden;">
-              <div style="width:23%;background:var(--pink);opacity:0.45;"></div>
-              <div style="width:77%;background:var(--pink);"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:3px;">
-              <span>Lima: 6 (23%)</span><span>Prov: 20 (77%)</span>
-            </div>
-          </div>
-          <div>
-            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;">
-              <span style="color:var(--blue);font-weight:500;">♂ Hombres (24)</span>
-            </div>
-            <div style="display:flex;height:9px;border-radius:5px;overflow:hidden;">
-              <div style="width:46%;background:var(--blue);opacity:0.45;"></div>
-              <div style="width:54%;background:var(--blue);"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:3px;">
-              <span>Lima: 11 (46%)</span><span>Prov: 13 (54%)</span>
-            </div>
-          </div>
-          <div style="background:var(--bg);border-radius:6px;padding:10px;font-size:11px;color:var(--text2);line-height:1.6;">
-            Mujeres = <strong>77% provincia</strong>. Hombres más balanceados (54/46). Provincia es tu mercado core.
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <hr class="div">
-
-  <!-- INSIGHTS -->
-  <div class="sec">
-    <div class="sec-label">Análisis</div>
-    <div class="sec-title">Lo que quizás no estás viendo</div>
-    <div class="insight-grid">
-      <div class="insight danger">
-        <div class="insight-icon">📉</div>
-        <div class="insight-title">S2 fue tu única semana en pérdida</div>
-        <div class="insight-body">La semana 17–23 Nov tuvo <strong>utilidad negativa (–S/. 30)</strong> por el pedido de Gal (CSM-B 1200 a S/. 0 con costo de S/. 40). Un solo pedido mal priceado hundió toda la semana.</div>
-      </div>
-      <div class="insight good">
-        <div class="insight-icon">💰</div>
-        <div class="insight-title">PERSONALIZADO es tu producto más rentable</div>
-        <div class="insight-body">Con <strong>74% de margen y S/. 102 de utilidad por pedido</strong>, casi duplica el rendimiento del resto. Melissa Barros generó S/. 180 de utilidad sola. Prioriza este tipo de pedidos.</div>
-      </div>
-      <div class="insight warn">
-        <div class="insight-icon">📦</div>
-        <div class="insight-title">CSM-B 1200: tu producto menos rentable</div>
-        <div class="insight-body">Solo <strong>31.5% de margen</strong>, el peor de toda tu línea. Si el cliente normal paga S/. 94, solo quedan ~S/. 18 de ganancia real. Considera subir el precio o descontinuarlo.</div>
-      </div>
-      <div class="insight info">
-        <div class="insight-icon">📈</div>
-        <div class="insight-title">Tu margen mejoró con el tiempo</div>
-        <div class="insight-body">Noviembre: <strong>40% margen</strong>. Diciembre: 58%. Febrero: 56%. No es solo que vendes más — también estás siendo más eficiente. Probablemente costos de costo/producto bajaron o el mix mejoró.</div>
-      </div>
-      <div class="insight warn">
-        <div class="insight-icon">🌍</div>
-        <div class="insight-title">Provincia = 67% de clientes, mayor riesgo logístico</div>
-        <div class="insight-body">DINSIDES y SHALOM, tus dos couriers de provincia, son los únicos con incidencias registradas. A más volumen provincial, más exposición. Vale negociar mejores condiciones o revisar sus SLAs.</div>
-      </div>
-      <div class="insight good">
-        <div class="insight-icon">🆕</div>
-        <div class="insight-title">Los modelos 890: nueva línea prometedora</div>
-        <div class="insight-body">Aparecieron en febrero con <strong>5 ventas y márgenes de 52–54%</strong>, similares a la línea 1200. Si el precio de costo es menor y el precio de venta compite bien, pueden abrir un nuevo segmento.</div>
-      </div>
-    </div>
-  </div>
-
-</div>
-
+<div class="card note"><b>Cómo leer esto:</b> más mensajes no significa automáticamente más interés; puede reflejar estilo de escritura. Responder rápido tampoco prueba compromiso. Por eso el índice combina volumen, inicios, preguntas, planes, afecto, cuidado y rapidez. Los resultados describen el chat, no la relación completa ni lo sucedido fuera de WhatsApp.</div>
+</main>
 <script>
-/* ── DATA ── */
-const weekly = [
-  {s:"S1", r:"10–16 Nov",  ped:1,  tot:80,    util:41.97,  proj:false},
-  {s:"S2", r:"17–23 Nov",  ped:2,  tot:50,    util:-30.06, proj:false},
-  {s:"S3", r:"24–30 Nov",  ped:5,  tot:457.7, util:223.52, proj:false},
-  {s:"S4", r:"01–07 Dic",  ped:3,  tot:457,   util:266.85, proj:false},
-  {s:"S5", r:"08–14 Dic",  ped:2,  tot:195,   util:118.94, proj:false},
-  {s:"S6", r:"15–21 Dic",  ped:6,  tot:569.2, util:331.03, proj:false},
-  {s:"S7", r:"22–28 Dic",  ped:2,  tot:173.5, util:93.44,  proj:false},
-  {s:"S8", r:"12–18 Ene",  ped:1,  tot:94,    util:45.47,  proj:false},
-  {s:"S9", r:"26 Ene–01 Feb", ped:7, tot:676.2, util:347.46, proj:false},
-  {s:"S10",r:"02–08 Feb",  ped:8,  tot:935,   util:592.69, proj:false},
-  {s:"S11",r:"09–15 Feb",  ped:6,  tot:560.3, util:277.62, proj:false},
-  {s:"S12",r:"16–22 Feb",  ped:8,  tot:710,   util:370.57, proj:false},
-  {s:"S13",r:"23 Feb–01 Mar",ped:null,tot:748, util:396,   proj:true},
-  {s:"S14",r:"02–08 Mar",  ped:null,tot:819,  util:433,    proj:true},
-  {s:"S15",r:"09–15 Mar",  ped:null,tot:890,  util:472,    proj:true},
-  {s:"S16",r:"16–22 Mar",  ped:null,tot:961,  util:509,    proj:true},
-];
+const D={"weekly": [{"week": 1, "range": "16–17 de mayo", "start": "2026-05-16", "end": "2026-05-17", "total": 0, "Raúl": {"messages": 0, "text_messages": 0, "media": 0, "share": 0, "active_days": 0, "initiations": 0, "questions": 0, "affection": 0, "plans": 0, "care": 0, "apologies": 0, "compliments": 0, "future": 0, "cancels": 0, "median_response": null, "avg_response": null, "ganas_score": 50.0, "want_score": 50.0, "green_flags": [], "red_flags": []}, "Angie": {"messages": 0, "text_messages": 0, "media": 0, "share": 0, "active_days": 0, "initiations": 0, "questions": 0, "affection": 0, "plans": 0, "care": 0, "apologies": 0, "compliments": 0, "future": 0, "cancels": 0, "median_response": null, "avg_response": null, "ganas_score": 50.0, "want_score": 50.0, "green_flags": [], "red_flags": []}, "more_ganas": "Empate técnico", "wants_more": "No se puede distinguir", "headline": "Sin conversación registrada", "reading": "El chat exportado empieza el 18 de mayo."}, {"week": 2, "range": "18–24 de mayo", "start": "2026-05-18", "end": "2026-05-24", "total": 638, "Raúl": {"messages": 280, "text_messages": 243, "media": 37, "share": 43.9, "active_days": 7, "initiations": 2, "questions": 79, "affection": 4, "plans": 13, "care": 3, "apologies": 2, "compliments": 3, "future": 2, "cancels": 1, "median_response": 6.6, "avg_response": 19.0, "ganas_score": 52.1, "want_score": 53.2, "green_flags": ["mostró mayor curiosidad con preguntas", "expresó más afecto", "respondió con bastante rapidez"], "red_flags": []}, "Angie": {"messages": 358, "text_messages": 277, "media": 81, "share": 56.1, "active_days": 6, "initiations": 6, "questions": 51, "affection": 1, "plans": 13, "care": 3, "apologies": 0, "compliments": 0, "future": 3, "cancels": 1, "median_response": 15.0, "avg_response": 52.8, "ganas_score": 47.9, "want_score": 46.9, "green_flags": ["tomó más veces la iniciativa"], "red_flags": []}, "more_ganas": "Raúl", "wants_more": "Raúl", "headline": "Angie envió más mensajes · Angie inició más conversaciones · Raúl lideró el índice de ganas", "reading": "En el chat de esta semana, raúl muestra más iniciativa conductual. El indicador de “quién quiere más” favorece a Raúl, pero es una lectura lúdica basada solo en mensajes."}, {"week": 3, "range": "25–31 de mayo", "start": "2026-05-25", "end": "2026-05-31", "total": 973, "Raúl": {"messages": 419, "text_messages": 368, "media": 51, "share": 43.1, "active_days": 7, "initiations": 0, "questions": 96, "affection": 9, "plans": 9, "care": 10, "apologies": 1, "compliments": 9, "future": 10, "cancels": 0, "median_response": 4.8, "avg_response": 14.9, "ganas_score": 41.7, "want_score": 48.1, "green_flags": ["expresó más afecto", "mostró más cuidado y seguimiento", "respondió con bastante rapidez"], "red_flags": ["no inició ninguna conversación nueva"]}, "Angie": {"messages": 554, "text_messages": 430, "media": 124, "share": 56.9, "active_days": 7, "initiations": 7, "questions": 89, "affection": 6, "plans": 16, "care": 9, "apologies": 0, "compliments": 6, "future": 2, "cancels": 0, "median_response": 12.9, "avg_response": 40.0, "ganas_score": 58.3, "want_score": 51.9, "green_flags": ["tomó más veces la iniciativa", "propuso o mencionó más planes", "mantuvo presencia constante"], "red_flags": []}, "more_ganas": "Angie", "wants_more": "No se puede distinguir", "headline": "Angie envió más mensajes · Angie inició más conversaciones · Angie lideró el índice de ganas", "reading": "En el chat de esta semana, angie muestra más iniciativa conductual. El indicador de “quién quiere más” favorece a No se puede distinguir, pero es una lectura lúdica basada solo en mensajes."}, {"week": 4, "range": "1–7 de junio", "start": "2026-06-01", "end": "2026-06-07", "total": 402, "Raúl": {"messages": 169, "text_messages": 154, "media": 15, "share": 42.0, "active_days": 7, "initiations": 5, "questions": 32, "affection": 8, "plans": 8, "care": 14, "apologies": 1, "compliments": 14, "future": 2, "cancels": 2, "median_response": 4.4, "avg_response": 58.3, "ganas_score": 61.9, "want_score": 75.0, "green_flags": ["mostró mayor curiosidad con preguntas", "propuso o mencionó más planes", "expresó más afecto"], "red_flags": []}, "Angie": {"messages": 233, "text_messages": 175, "media": 58, "share": 58.0, "active_days": 7, "initiations": 5, "questions": 24, "affection": 1, "plans": 6, "care": 5, "apologies": 0, "compliments": 3, "future": 0, "cancels": 2, "median_response": 22.3, "avg_response": 63.1, "ganas_score": 38.1, "want_score": 25.0, "green_flags": ["mantuvo presencia constante"], "red_flags": ["aparecieron varias expresiones de poca disponibilidad o cancelación"]}, "more_ganas": "Raúl", "wants_more": "Raúl", "headline": "Angie envió más mensajes · iniciativa equilibrada · Raúl lideró el índice de ganas", "reading": "En el chat de esta semana, raúl muestra más iniciativa conductual. El indicador de “quién quiere más” favorece a Raúl, pero es una lectura lúdica basada solo en mensajes."}, {"week": 5, "range": "8–14 de junio", "start": "2026-06-08", "end": "2026-06-14", "total": 399, "Raúl": {"messages": 156, "text_messages": 129, "media": 27, "share": 39.1, "active_days": 6, "initiations": 5, "questions": 28, "affection": 3, "plans": 8, "care": 5, "apologies": 0, "compliments": 4, "future": 1, "cancels": 1, "median_response": 1.6, "avg_response": 13.4, "ganas_score": 56.9, "want_score": 64.6, "green_flags": ["tomó más veces la iniciativa", "propuso o mencionó más planes", "mostró más cuidado y seguimiento"], "red_flags": []}, "Angie": {"messages": 243, "text_messages": 192, "media": 51, "share": 60.9, "active_days": 6, "initiations": 4, "questions": 33, "affection": 7, "plans": 3, "care": 1, "apologies": 0, "compliments": 10, "future": 0, "cancels": 1, "median_response": 20.2, "avg_response": 56.6, "ganas_score": 43.1, "want_score": 35.4, "green_flags": ["mostró mayor curiosidad con preguntas", "expresó más afecto"], "red_flags": []}, "more_ganas": "Raúl", "wants_more": "Raúl", "headline": "Angie envió más mensajes · Raúl inició más conversaciones · Raúl lideró el índice de ganas", "reading": "En el chat de esta semana, raúl muestra más iniciativa conductual. El indicador de “quién quiere más” favorece a Raúl, pero es una lectura lúdica basada solo en mensajes."}, {"week": 6, "range": "15–21 de junio", "start": "2026-06-15", "end": "2026-06-21", "total": 195, "Raúl": {"messages": 85, "text_messages": 75, "media": 10, "share": 43.6, "active_days": 7, "initiations": 6, "questions": 21, "affection": 4, "plans": 2, "care": 1, "apologies": 1, "compliments": 4, "future": 2, "cancels": 1, "median_response": 3.9, "avg_response": 46.6, "ganas_score": 67.6, "want_score": 80.7, "green_flags": ["tomó más veces la iniciativa", "mostró mayor curiosidad con preguntas", "expresó más afecto"], "red_flags": []}, "Angie": {"messages": 110, "text_messages": 85, "media": 25, "share": 56.4, "active_days": 5, "initiations": 2, "questions": 13, "affection": 1, "plans": 2, "care": 0, "apologies": 0, "compliments": 1, "future": 0, "cancels": 0, "median_response": 20.1, "avg_response": 49.4, "ganas_score": 32.4, "want_score": 19.4, "green_flags": [], "red_flags": []}, "more_ganas": "Raúl", "wants_more": "Raúl", "headline": "Angie envió más mensajes · Raúl inició más conversaciones · Raúl lideró el índice de ganas", "reading": "En el chat de esta semana, raúl muestra más iniciativa conductual. El indicador de “quién quiere más” favorece a Raúl, pero es una lectura lúdica basada solo en mensajes."}, {"week": 7, "range": "22–28 de junio", "start": "2026-06-22", "end": "2026-06-28", "total": 253, "Raúl": {"messages": 103, "text_messages": 92, "media": 11, "share": 40.7, "active_days": 6, "initiations": 1, "questions": 24, "affection": 9, "plans": 1, "care": 3, "apologies": 0, "compliments": 8, "future": 0, "cancels": 0, "median_response": 6.0, "avg_response": 47.8, "ganas_score": 51.5, "want_score": 56.2, "green_flags": ["expresó más afecto", "respondió con bastante rapidez"], "red_flags": []}, "Angie": {"messages": 150, "text_messages": 110, "media": 40, "share": 59.3, "active_days": 7, "initiations": 5, "questions": 23, "affection": 1, "plans": 1, "care": 3, "apologies": 0, "compliments": 2, "future": 0, "cancels": 0, "median_response": 32.1, "avg_response": 98.1, "ganas_score": 48.5, "want_score": 43.8, "green_flags": ["tomó más veces la iniciativa", "mantuvo presencia constante"], "red_flags": ["respondió notablemente más lento"]}, "more_ganas": "Empate técnico", "wants_more": "Raúl", "headline": "Angie envió más mensajes · Angie inició más conversaciones · ganas equilibradas", "reading": "En el chat de esta semana, ninguno claramente muestra más iniciativa conductual. El indicador de “quién quiere más” favorece a Raúl, pero es una lectura lúdica basada solo en mensajes."}, {"week": 8, "range": "29 de junio–5 de julio", "start": "2026-06-29", "end": "2026-07-05", "total": 258, "Raúl": {"messages": 114, "text_messages": 107, "media": 7, "share": 44.2, "active_days": 7, "initiations": 5, "questions": 27, "affection": 1, "plans": 6, "care": 3, "apologies": 1, "compliments": 2, "future": 2, "cancels": 1, "median_response": 3.1, "avg_response": 36.4, "ganas_score": 63.1, "want_score": 67.8, "green_flags": ["tomó más veces la iniciativa", "mostró mayor curiosidad con preguntas", "propuso o mencionó más planes"], "red_flags": []}, "Angie": {"messages": 144, "text_messages": 120, "media": 24, "share": 55.8, "active_days": 5, "initiations": 4, "questions": 16, "affection": 0, "plans": 4, "care": 4, "apologies": 0, "compliments": 0, "future": 1, "cancels": 0, "median_response": 16.6, "avg_response": 78.7, "ganas_score": 36.9, "want_score": 32.2, "green_flags": ["mostró más cuidado y seguimiento"], "red_flags": []}, "more_ganas": "Raúl", "wants_more": "Raúl", "headline": "Angie envió más mensajes · Raúl inició más conversaciones · Raúl lideró el índice de ganas", "reading": "En el chat de esta semana, raúl muestra más iniciativa conductual. El indicador de “quién quiere más” favorece a Raúl, pero es una lectura lúdica basada solo en mensajes."}, {"week": 9, "range": "6–12 de julio", "start": "2026-07-06", "end": "2026-07-12", "total": 1060, "Raúl": {"messages": 445, "text_messages": 402, "media": 43, "share": 42.0, "active_days": 7, "initiations": 5, "questions": 110, "affection": 4, "plans": 11, "care": 6, "apologies": 0, "compliments": 11, "future": 8, "cancels": 0, "median_response": 3.5, "avg_response": 24.5, "ganas_score": 58.4, "want_score": 58.2, "green_flags": ["tomó más veces la iniciativa", "mostró mayor curiosidad con preguntas", "propuso o mencionó más planes"], "red_flags": []}, "Angie": {"messages": 615, "text_messages": 465, "media": 150, "share": 58.0, "active_days": 7, "initiations": 2, "questions": 67, "affection": 3, "plans": 10, "care": 6, "apologies": 0, "compliments": 5, "future": 4, "cancels": 2, "median_response": 12.9, "avg_response": 32.3, "ganas_score": 41.6, "want_score": 41.8, "green_flags": ["mantuvo presencia constante"], "red_flags": ["aparecieron varias expresiones de poca disponibilidad o cancelación"]}, "more_ganas": "Raúl", "wants_more": "Raúl", "headline": "Angie envió más mensajes · Raúl inició más conversaciones · Raúl lideró el índice de ganas", "reading": "En el chat de esta semana, raúl muestra más iniciativa conductual. El indicador de “quién quiere más” favorece a Raúl, pero es una lectura lúdica basada solo en mensajes."}, {"week": 10, "range": "13–15 de julio", "start": "2026-07-13", "end": "2026-07-15", "total": 404, "Raúl": {"messages": 169, "text_messages": 144, "media": 25, "share": 41.8, "active_days": 3, "initiations": 0, "questions": 53, "affection": 3, "plans": 2, "care": 3, "apologies": 0, "compliments": 4, "future": 2, "cancels": 1, "median_response": 3.1, "avg_response": 10.4, "ganas_score": 38.2, "want_score": 37.6, "green_flags": ["mostró mayor curiosidad con preguntas", "respondió con bastante rapidez", "mantuvo presencia constante"], "red_flags": ["no inició ninguna conversación nueva"]}, "Angie": {"messages": 235, "text_messages": 183, "media": 52, "share": 58.2, "active_days": 3, "initiations": 3, "questions": 24, "affection": 6, "plans": 4, "care": 7, "apologies": 0, "compliments": 5, "future": 0, "cancels": 1, "median_response": 12.6, "avg_response": 33.2, "ganas_score": 61.8, "want_score": 62.4, "green_flags": ["tomó más veces la iniciativa", "propuso o mencionó más planes", "expresó más afecto"], "red_flags": []}, "more_ganas": "Angie", "wants_more": "Angie", "headline": "Angie envió más mensajes · Angie inició más conversaciones · Angie lideró el índice de ganas", "reading": "En el chat de esta semana, angie muestra más iniciativa conductual. El indicador de “quién quiere más” favorece a Angie, pero es una lectura lúdica basada solo en mensajes."}], "overall": {"Raúl": {"messages": 1940, "share": 42.3, "initiations": 29, "median_response": 3.9, "avg_response": 27.8, "questions": 470, "affection": 45, "plans": 60, "care": 48, "future": 29, "media": 226}, "Angie": {"messages": 2642, "share": 57.7, "initiations": 38, "median_response": 15.0, "avg_response": 50.9, "questions": 340, "affection": 26, "plans": 59, "care": 38, "future": 10, "media": 605}}};
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const val=v=>v==null?'—':v;
+const O=D.overall;
+document.getElementById('hero').innerHTML=['Raúl','Angie'].map(p=>{
+ const x=O[p], cls=p==='Raúl'?'raul':'angie';
+ return `<div class="side"><div class="person"><i class="dot ${cls}"></i>${p}</div><div class="big">${x.messages.toLocaleString('es-PE')}</div><div class="muted">mensajes · ${x.share}% del chat</div><div class="metrics">
+ <div class="metric"><b>${x.initiations}</b><span>inicios</span></div><div class="metric"><b>${x.median_response} min</b><span>respuesta habitual</span></div>
+ <div class="metric"><b>${x.questions}</b><span>preguntas</span></div><div class="metric"><b>${x.plans}</b><span>mensajes de planes</span></div>
+ </div></div>`;
+}).join('');
 
-const monthly = [
-  {m:"Nov", nombre:"Nov 2025",  ped:8,  tot:587.7,  costo:352.27, util:235.43, margen:40.1},
-  {m:"Dic", nombre:"Dic 2025",  ped:13, tot:1394.7, costo:584.45, util:810.26, margen:58.1},
-  {m:"Ene", nombre:"Ene 2026",  ped:8,  tot:770.2,  costo:377.27, util:392.93, margen:51.0},
-  {m:"Feb", nombre:"Feb 2026",  ped:22, tot:2205.9, costo:965.03, util:1240.88,margen:56.3},
-];
+const win=(a,b,ra='Raúl',an='Angie',tol=0)=>Math.abs(a-b)<=tol?'Empate':(a>b?ra:an);
+const overallWinners={
+ messages:win(O['Raúl'].messages,O['Angie'].messages),
+ initiations:win(O['Raúl'].initiations,O['Angie'].initiations),
+ speed:win(O['Angie'].median_response,O['Raúl'].median_response), // lower time wins
+ questions:win(O['Raúl'].questions,O['Angie'].questions),
+ plans:win(O['Raúl'].plans,O['Angie'].plans),
+ affection:win(O['Raúl'].affection,O['Angie'].affection)
+};
+document.getElementById('scoreboard').innerHTML=`
+<div class="card scorecard"><div class="muted">Más conversación</div><div class="winner">${overallWinners.messages}</div><p>Angie tiene mayor volumen total. Esto indica más participación escrita, aunque no necesariamente más interés.</p></div>
+<div class="card scorecard"><div class="muted">Más iniciativa para reabrir chats</div><div class="winner">${overallWinners.initiations}</div><p>Se cuentan conversaciones nuevas tras seis horas o más de silencio.</p></div>
+<div class="card scorecard"><div class="muted">Respuesta habitual más rápida</div><div class="winner">${overallWinners.speed}</div><p>Raúl: ${O['Raúl'].median_response} min · Angie: ${O['Angie'].median_response} min.</p></div>
+<div class="card scorecard"><div class="muted">Más curiosidad</div><div class="winner">${overallWinners.questions}</div><p>Basado en la cantidad de preguntas realizadas dentro del chat.</p></div>
+<div class="card scorecard"><div class="muted">Más menciones de planes</div><div class="winner">${overallWinners.plans}</div><p>Incluye propuestas, intención de verse, restaurantes, salidas y fechas.</p></div>
+<div class="card scorecard"><div class="muted">Más lenguaje afectivo</div><div class="winner">${overallWinners.affection}</div><p>Conteo orientativo de besos, halagos, “te extraño”, ganas de verse y expresiones similares.</p></div>`;
 
-const prodFreq = [
-  {name:"OP-L-N 1200", count:11, util:503.3},
-  {name:"PERSONALIZADO",count:4,  util:409.7},
-  {name:"OP-L-B 1200", count:5,  util:277.1},
-  {name:"JJK-N 1200",  count:4,  util:182.5},
-  {name:"DS-N 1200",   count:4,  util:182.3},
-  {name:"N-N 1200",    count:4,  util:169.3},
-  {name:"DS-B 1200",   count:3,  util:143.1},
-  {name:"CSM-B 1200",  count:4,  util:73.8},
-];
+document.getElementById('summaryBody').innerHTML=D.weekly.map(w=>{
+ const r=w['Raúl'],a=w['Angie'];
+ const init=win(r.initiations,a.initiations);
+ return `<tr><td><b>S${w.week}</b><br><span class="muted">${esc(w.range)}</span></td>
+ <td><span class="rtext">${r.messages}</span> / <span class="atext">${a.messages}</span></td>
+ <td><span class="winner-pill">${init}</span><br>${r.initiations} / ${a.initiations}</td>
+ <td>${val(r.median_response)} / ${val(a.median_response)} min</td>
+ <td>${r.questions} / ${a.questions}</td><td>${r.plans} / ${a.plans}</td>
+ <td>${r.affection} / ${a.affection}</td><td>${r.care} / ${a.care}</td>
+ <td><span class="winner-pill">${w.more_ganas}</span><br><span class="muted">${r.ganas_score} vs ${a.ganas_score}</span></td>
+ <td><span class="winner-pill">${w.wants_more}</span><br><span class="muted">${r.want_score} vs ${a.want_score}</span></td>
+ <td>${esc(w.headline)}</td></tr>`;
+}).join('');
 
-const prodMargin = [
-  {name:"PERSONALIZADO",  margen:73.9},
-  {name:"ST-N 1200",      margen:57.4},
-  {name:"OP-L-B 1200",    margen:56.5},
-  {name:"ST-B 1200",      margen:56.5},
-  {name:"N-B 1200",       margen:55.5},
-  {name:"DB-B 1200",      margen:54.2},
-  {name:"JJK-B 890",      margen:54.0},
-  {name:"DS-B 1200",      margen:55.2},
-  {name:"N-N 1200",       margen:51.4},
-  {name:"CSM-B 1200",     margen:31.5},
-];
-
-const fmt  = n => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,',');
-const fmtD = n => n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
-
-/* ── BAR ROWS ── */
-function renderBars(id, data, maxVal, fillFn, valFn, subFn) {
-  const el = document.getElementById(id); if (!el) return;
-  el.innerHTML = data.map(d => {
-    const pct = (valFn(d) / maxVal * 100).toFixed(1);
-    return `<div class="bar-item">
-      <div class="bi-label" style="min-width:110px">${d.name}</div>
-      <div class="bi-track"><div class="bi-fill" style="width:${pct}%;background:${fillFn(d)}"></div></div>
-      ${subFn ? `<div class="bi-sub">${subFn(d)}</div>` : ''}
-      <div class="bi-val">${fmtD(valFn(d))}</div>
-    </div>`;
-  }).join('');
+function flagList(items, noneText){
+ return items.length?`<ul style="margin:0;padding-left:17px">${items.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:`<span class="none">${noneText}</span>`;
 }
-
-renderBars('prod-freq',   prodFreq,   503.3, ()=>'var(--blue)',  d=>d.util,   d=>`×${d.count}`);
-renderBars('prod-margin', prodMargin, 74,    d => d.margen >= 55 ? 'var(--green)' : d.margen >= 45 ? 'var(--blue)' : 'var(--red)', d=>d.margen, null);
-
-/* ── WEEKLY CHART: venta + utilidad ── */
-(function(){
-  const svg = document.getElementById('wsvg');
-  const W=880, H=250, pl=50, pr=20, pt=22, pb=36;
-  const cW=W-pl-pr, cH=H-pt-pb;
-  const maxV = Math.max(...weekly.map(d=>d.tot)) * 1.18;
-  const n = weekly.length;
-  const xp = i => pl + (i/(n-1))*cW;
-  const yp = v => pt + cH - (Math.max(0,v)/maxV)*cH;
-  const hist = weekly.filter(d=>!d.proj);
-  const hi = hist.length - 1;
-
-  let h = `<defs>
-    <linearGradient id="totg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#2563EB" stop-opacity="0.08"/>
-      <stop offset="100%" stop-color="#2563EB" stop-opacity="0"/>
-    </linearGradient>
-    <linearGradient id="utilg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#16A34A" stop-opacity="0.15"/>
-      <stop offset="100%" stop-color="#16A34A" stop-opacity="0"/>
-    </linearGradient>
-    <linearGradient id="projg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.06"/>
-      <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0"/>
-    </linearGradient>
-  </defs>`;
-
-  // Grid
-  [0,.25,.5,.75,1].forEach(f=>{
-    const y=yp(maxV*f);
-    h+=`<line x1="${pl}" y1="${y}" x2="${W-pr}" y2="${y}" stroke="#EBEBEA" stroke-width="1"/>`;
-    if(f>0) h+=`<text x="${pl-6}" y="${y+4}" fill="#C8C8C2" font-size="9" text-anchor="end" font-family="DM Sans,sans-serif">${fmt(maxV*f)}</text>`;
-  });
-
-  // Total area hist
-  let hArea=`M${xp(0)},${pt+cH}`;
-  hist.forEach((_,i)=>hArea+=` L${xp(i)},${yp(hist[i].tot)}`);
-  hArea+=` L${xp(hi)},${pt+cH}Z`;
-  h+=`<path d="${hArea}" fill="url(#totg)"/>`;
-
-  // Util area hist
-  let uArea=`M${xp(0)},${pt+cH}`;
-  hist.forEach((_,i)=>uArea+=` L${xp(i)},${yp(hist[i].util)}`);
-  uArea+=` L${xp(hi)},${pt+cH}Z`;
-  h+=`<path d="${uArea}" fill="url(#utilg)"/>`;
-
-  // Proj area
-  let pArea=`M${xp(hi)},${pt+cH} L${xp(hi)},${yp(weekly[hi].tot)}`;
-  for(let i=hist.length;i<n;i++) pArea+=` L${xp(i)},${yp(weekly[i].tot)}`;
-  pArea+=` L${xp(n-1)},${pt+cH}Z`;
-  h+=`<path d="${pArea}" fill="url(#projg)"/>`;
-
-  // Lines
-  h+=`<path d="${hist.map((_,i)=>`${i?'L':'M'}${xp(i)},${yp(hist[i].tot)}`).join(' ')}" fill="none" stroke="#2563EB" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
-  h+=`<path d="${hist.map((_,i)=>`${i?'L':'M'}${xp(i)},${yp(hist[i].util)}`).join(' ')}" fill="none" stroke="#16A34A" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>`;
-
-  let pLine=`M${xp(hi)},${yp(weekly[hi].tot)}`;
-  for(let i=hist.length;i<n;i++) pLine+=` L${xp(i)},${yp(weekly[i].tot)}`;
-  h+=`<path d="${pLine}" fill="none" stroke="#8B5CF6" stroke-width="2" stroke-dasharray="5,4" stroke-linejoin="round"/>`;
-
-  // Divider
-  const dx=xp(hi);
-  h+=`<line x1="${dx}" y1="${pt}" x2="${dx}" y2="${pt+cH}" stroke="#E0E0DC" stroke-width="1" stroke-dasharray="3,3"/>`;
-  h+=`<text x="${dx+5}" y="${pt+11}" fill="#C0C0BA" font-size="8.5" font-family="DM Sans,sans-serif">proyección →</text>`;
-
-  // Dots
-  weekly.forEach((d,i)=>{
-    const x=xp(i), y=yp(d.tot), c=d.proj?'#8B5CF6':'#2563EB';
-    h+=`<circle cx="${x}" cy="${y}" r="${d.proj?2.8:3.5}" fill="${d.proj?'white':c}" stroke="${c}" stroke-width="${d.proj?1.5:0}"/>`;
-    if(!d.proj) h+=`<circle cx="${x}" cy="${yp(d.util)}" r="2.5" fill="#16A34A"/>`;
-    h+=`<circle cx="${x}" cy="${y}" r="10" fill="transparent" class="wpt" data-i="${i}" style="cursor:default"/>`;
-    h+=`<text x="${x}" y="${H-pb+13}" fill="${d.proj?'#C8C8C2':'#B0B0AA'}" font-size="8" text-anchor="middle" font-family="DM Sans,sans-serif">${d.s}</text>`;
-  });
-
-  svg.innerHTML=h;
-  const tt=document.getElementById('wtt');
-  svg.querySelectorAll('.wpt').forEach(el=>{
-    el.addEventListener('mouseenter',()=>{
-      const i=+el.getAttribute('data-i'), d=weekly[i];
-      const r=svg.getBoundingClientRect();
-      const x=xp(i)/W*r.width, y=yp(d.tot)/H*r.height;
-      const margen = d.tot>0 ? (d.util/d.tot*100).toFixed(1) : '—';
-      tt.innerHTML=`<div class="tt-lbl">${d.s} · ${d.r}</div><div class="tt-val">S/. ${fmtD(d.tot)}</div><div class="tt-sub">${d.proj?'🔮 proyección':`Util: S/. ${fmtD(d.util)} · Margen: ${margen}%`}</div>`;
-      tt.style.left=x+'px'; tt.style.top=(y-68)+'px'; tt.classList.add('show');
-    });
-    el.addEventListener('mouseleave',()=>tt.classList.remove('show'));
-  });
-})();
-
-/* ── MONTHLY STACKED BAR ── */
-(function(){
-  const svg=document.getElementById('msvg');
-  const W=880,H=220,pl=50,pr=20,pt=18,pb=44;
-  const cW=W-pl-pr,cH=H-pt-pb;
-  const maxV=Math.max(...monthly.map(d=>d.tot))*1.18;
-  const slot=cW/monthly.length, bw=slot*0.38;
-  const yp=v=>pt+cH-(v/maxV)*cH;
-
-  let h='';
-  [0,.25,.5,.75,1].forEach(f=>{
-    const y=yp(maxV*f);
-    h+=`<line x1="${pl}" y1="${y}" x2="${W-pr}" y2="${y}" stroke="#EBEBEA" stroke-width="1"/>`;
-    if(f>0) h+=`<text x="${pl-6}" y="${y+4}" fill="#C8C8C2" font-size="9" text-anchor="end" font-family="DM Sans,sans-serif">${fmt(maxV*f)}</text>`;
-  });
-
-  monthly.forEach((d,i)=>{
-    const x=pl+i*slot+(slot-bw)/2;
-    const costoH=(d.costo/maxV)*cH, utilH=(d.util/maxV)*cH;
-    const costoY=pt+cH-costoH-utilH, utilY=pt+cH-utilH;
-
-    h+=`<rect x="${x}" y="${costoY}" width="${bw}" height="${costoH}" fill="rgba(220,38,38,0.18)" rx="0"/>`;
-    h+=`<rect x="${x}" y="${utilY}"  width="${bw}" height="${utilH}"  fill="rgba(22,163,74,0.75)"  rx="5" ry="5"/>`;
-    // fix bottom corners
-    h+=`<rect x="${x}" y="${utilY+utilH-6}" width="${bw}" height="6" fill="rgba(22,163,74,0.75)"/>`;
-
-    h+=`<rect x="${pl+i*slot}" y="${pt}" width="${slot}" height="${cH}" fill="transparent" class="mpt" data-i="${i}" style="cursor:default"/>`;
-    h+=`<text x="${x+bw/2}" y="${H-pb+16}" fill="#AEAEA8" font-size="12" text-anchor="middle" font-family="DM Sans,sans-serif" font-weight="500">${d.m}</text>`;
-    h+=`<text x="${x+bw/2}" y="${costoY-7}" fill="#64748B" font-size="9.5" text-anchor="middle" font-family="DM Sans,sans-serif" font-weight="500">S/. ${fmt(d.tot)}</text>`;
-    if(utilH>18) h+=`<text x="${x+bw/2}" y="${utilY+utilH/2+4}" fill="white" font-size="9" text-anchor="middle" font-family="DM Sans,sans-serif" opacity="0.95">${d.margen}%</text>`;
-  });
-
-  svg.innerHTML=h;
-  const tt=document.getElementById('mtt');
-  svg.querySelectorAll('.mpt').forEach(el=>{
-    el.addEventListener('mouseenter',()=>{
-      const i=+el.getAttribute('data-i'),d=monthly[i];
-      const cx=pl+i*slot+slot/2, cy=yp(d.tot);
-      const r=svg.getBoundingClientRect();
-      tt.innerHTML=`<div class="tt-lbl">${d.nombre} · ${d.ped} pedidos</div><div class="tt-val">S/. ${fmtD(d.tot)}</div><div class="tt-sub">Util: S/. ${fmtD(d.util)} · Costo: S/. ${fmtD(d.costo)} · Margen: ${d.margen}%</div>`;
-      tt.style.left=(cx/W*r.width)+'px'; tt.style.top=((cy/H*r.height)-72)+'px'; tt.classList.add('show');
-    });
-    el.addEventListener('mouseleave',()=>tt.classList.remove('show'));
-  });
-})();
-</script>
-</body>
-</html>
+document.getElementById('weeks').innerHTML=D.weekly.map(w=>{
+ const r=w['Raúl'],a=w['Angie'];
+ const total=Math.max(1,w.total);
+ const rp=Math.round(100*r.messages/total), ap=100-rp;
+ return `<article class="card week">
+ <div class="weektop"><div><h3>Semana ${w.week}</h3><div class="range">${esc(w.range)}</div></div><span class="winner-pill">${w.more_ganas}</span></div>
+ <div class="headline">${esc(w.headline)}</div><div class="reading">${esc(w.reading)}</div>
+ <div class="duel">
+ <div class="duelbox"><h4 class="rtext">Raúl</h4><div class="bar"><i style="width:${rp}%;background:var(--raul)"></i></div>
+ <div class="row"><span>Mensajes</span><b>${r.messages}</b></div><div class="row"><span>Inicios</span><b>${r.initiations}</b></div>
+ <div class="row"><span>Respuesta mediana</span><b>${val(r.median_response)} min</b></div><div class="row"><span>Preguntas</span><b>${r.questions}</b></div>
+ <div class="row"><span>Planes</span><b>${r.plans}</b></div><div class="row"><span>Afecto / cuidado</span><b>${r.affection} / ${r.care}</b></div>
+ <div class="row"><span>Índice de ganas</span><b>${r.ganas_score}</b></div></div>
+ <div class="duelbox"><h4 class="atext">Angie</h4><div class="bar"><i style="width:${ap}%;background:var(--angie)"></i></div>
+ <div class="row"><span>Mensajes</span><b>${a.messages}</b></div><div class="row"><span>Inicios</span><b>${a.initiations}</b></div>
+ <div class="row"><span>Respuesta mediana</span><b>${val(a.median_response)} min</b></div><div class="row"><span>Preguntas</span><b>${a.questions}</b></div>
+ <div class="row"><span>Planes</span><b>${a.plans}</b></div><div class="row"><span>Afecto / cuidado</span><b>${a.affection} / ${a.care}</b></div>
+ <div class="row"><span>Índice de ganas</span><b>${a.ganas_score}</b></div></div></div>
+ <div class="flags">
+ <div><div class="flagbox green"><b>Green flags de Raúl</b><br>${flagList(r.green_flags,'No hay una green flag clara esta semana.')}</div>
+ <div class="flagbox red"><b>Red flags de Raúl</b><br>${flagList(r.red_flags,'No hay una red flag clara esta semana.')}</div></div>
+ <div><div class="flagbox green"><b>Green flags de Angie</b><br>${flagList(a.green_flags,'No hay una green flag clara esta semana.')}</div>
+ <div class="flagbox red"><b>Red flags de Angie</b><br>${flagList(a.red_flags,'No hay una red flag clara esta semana.')}</div></div>
+ </div></article>`;
+}).join('');
+</script></body></html>
